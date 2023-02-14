@@ -5,8 +5,7 @@ on:
       - 'main'
       - 'update/ci/docker/*'
       - 'update/docker/*'
-    tags:
-      - 'v*.*.*'
+  workflow_dispatch:
 
 jobs:
   docker:
@@ -28,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ${{ matrix.flavor }}
     env:
-      PLATFORMS: 'linux/amd64,linux/arm64'
+      PLATFORMS: 'linux/amd64'
       DOCKERFILE: 'docker/Dockerfile'
     steps:
       - name: Checkout
