@@ -80,6 +80,8 @@ dependencies = [
   "torchmetrics",
   "transformers~=4.25",
   "windows-curses; sys_platform=='win32'",
+	"xformers~=0.0.16; sys_platform!='darwin'",
+	"triton; sys_platform=='linux'",
 ]
 
 [project.optional-dependencies]
@@ -90,10 +92,7 @@ dependencies = [
   "mkdocs-redirects==1.2.0",
 ]
 "test" = ["pytest>6.0.0", "pytest-cov"]
-"xformers" = [
-	   "xformers~=0.0.16; sys_platform!='darwin'",
-	   "triton; sys_platform=='linux'",
-]
+
 
 [project.scripts]
 
