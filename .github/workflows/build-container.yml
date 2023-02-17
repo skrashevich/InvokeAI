@@ -2,10 +2,16 @@ name: build container image
 on:
   push:
     branches:
-      - 'main'
-      - 'update/ci/docker/*'
-      - 'update/docker/*'
+      - '*'
+    paths:
+      - 'pyproject.toml'
+      - 'ldm/**'
+      - 'invokeai/backend/**'
+      - 'invokeai/configs/**'
+      - 'invokeai/frontend/dist/**'
+      - 'docker/Dockerfile'
   workflow_dispatch:
+
 
 jobs:
   docker:
