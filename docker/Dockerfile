@@ -82,10 +82,9 @@ FROM python-base AS runtime
 ARG UNAME=appuser
 ARG UID=1000
 ARG GID=1000
-RUN useradd \
+RUN groupadd -o -g "${GID}" "${UNAME}" && useradd \
   --no-log-init \
   -m \
-  -U \
   -u ${UID} \
   -g ${GID} \
   "${UNAME}"
