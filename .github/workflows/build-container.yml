@@ -91,7 +91,10 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/tags/*' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: PIP_EXTRA_INDEX_URL=${{ matrix.pip-extra-index-url }}
+          build-args: |
+            PIP_EXTRA_INDEX_URL=${{ matrix.pip-extra-index-url }}
+            UID=99
+            GID=100
           cache-from: |
             type=gha,scope=${{ github.ref_name }}-${{ matrix.flavor }}
             type=gha,scope=main-${{ matrix.flavor }}
