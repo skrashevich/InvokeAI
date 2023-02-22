@@ -178,7 +178,9 @@ class Generate:
         self.model_hash = None
         self.sampler = None
         self.device = None
-        self.session_peakmem = None
+        self.max_memory_allocated = 0
+        self.memory_allocated = 0
+        self.session_peakmem = 0
         self.base_generator = None
         self.seed = None
         self.outdir = outdir
@@ -781,6 +783,7 @@ class Generate:
                 embiggen_tiles=opt.embiggen_tiles,
                 embiggen_strength=opt.embiggen_strength,
                 image_callback=callback,
+                clear_cuda_cache=self.clear_cuda_cache,
             )
         elif tool == "outpaint":
             from ldm.invoke.restoration.outpaint import Outpaint
@@ -972,7 +975,7 @@ class Generate:
                         ti_path, defer_injecting_tokens=True
                     )
             print(
-                f'>> Textual inversion triggers: {", ".join(self.model.textual_inversion_manager.get_all_trigger_strings())}'
+                f'>> Textual inversion triggers: {", ".join(sorted(self.model.textual_inversion_manager.get_all_trigger_strings()))}'
             )
 
         self.model_name = model_name
