@@ -1,5 +1,7 @@
-'''
+"""
 Initialization file for invokeai.backend
-'''
-from .invoke_ai_web_server import InvokeAIWebServer
-
+"""
+from .generate import Generate
+from .model_management import ModelManager
+from .args import Args
+from .globals import Globals

@@ -5,7 +5,7 @@ on:
       - '*'
     paths:
       - 'pyproject.toml'
-      - 'ldm/**'
+      - 'invokeai/**'
       - 'invokeai/backend/**'
       - 'invokeai/configs/**'
       - 'invokeai/frontend/dist/**'

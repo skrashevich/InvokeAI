@@ -34,13 +34,13 @@ classifiers = [
   'Topic :: Scientific/Engineering :: Image Processing',
 ]
 dependencies = [
-  "accelerate",
+  "accelerate~=0.16",
   "albumentations",
   "click",
   "clip_anytorch",          # replacing "clip @ https://github.com/openai/CLIP/archive/eaa22acb90a5876642d0507623e859909230a52d.zip",
   "compel==0.1.7",
   "datasets",
-  "diffusers[torch]~=0.13",
+  "diffusers[torch]~=0.14",
   "dnspython==2.2.1",
   "einops",
   "eventlet",
@@ -73,7 +73,7 @@ dependencies = [
   "pytorch-lightning==1.7.7",
   "realesrgan",
   "requests==2.28.2",
-  "safetensors",
+  "safetensors~=0.3.0",
   "scikit-image>=0.19",
   "send2trash",
   "streamlit",
@@ -83,7 +83,7 @@ dependencies = [
   "torch-fidelity",
   "torchvision>=0.14.1",
   "torchmetrics",
-  "transformers~=4.25",
+  "transformers~=4.26",
   "uvicorn[standard]==0.20.0",
   "windows-curses; sys_platform=='win32'",
 	"xformers~=0.0.16; sys_platform!='darwin'",
@@ -103,19 +103,20 @@ dependencies = [
 [project.scripts]
 
 # legacy entrypoints; provided for backwards compatibility
-"invoke.py" = "ldm.invoke.CLI:main"
-"configure_invokeai.py" = "ldm.invoke.config.invokeai_configure:main"
-"textual_inversion.py" = "ldm.invoke.training.textual_inversion:main"
-"merge_embeddings.py" = "ldm.invoke.merge_diffusers:main"
+"invoke.py" = "invokeai.frontend.CLI:invokeai_command_line_interface"
+"configure_invokeai.py" = "invokeai.frontend.install:invokeai_configure"
+"textual_inversion.py" = "invokeai.frontend.training:invokeai_textual_inversion"
 
 # modern entrypoints
-"invokeai" = "ldm.invoke.CLI:main"
-"invokeai-new" = "ldm.invoke.app.api_app:invoke_api"
-"invokeai-configure" = "ldm.invoke.config.invokeai_configure:main"
-"invokeai-merge" = "ldm.invoke.merge_diffusers:main"   # note name munging
-"invokeai-ti" = "ldm.invoke.training.textual_inversion:main"
-"invokeai-model-install" = "ldm.invoke.config.model_install:main"
-"invokeai-update" = "ldm.invoke.config.invokeai_update:main"
+"invokeai" = "invokeai.frontend.CLI:invokeai_command_line_interface"
+"invokeai-configure" = "invokeai.frontend.install:invokeai_configure"
+"invokeai-merge" = "invokeai.frontend.merge:invokeai_merge_diffusers"
+"invokeai-ti" = "invokeai.frontend.training:invokeai_textual_inversion"
+"invokeai-model-install" = "invokeai.frontend.install:invokeai_model_install"
+"invokeai-update" = "invokeai.frontend.config:invokeai_update"
+"invokeai-metadata" = "invokeai.frontend.CLI.sd_metadata:print_metadata"
+"invokeai-node-cli" = "invokeai.app.cli_app:invoke_cli"
+"invokeai-node-web" = "invokeai.app.api_app:invoke_api"
 
 [project.urls]
 "Homepage" = "https://invoke-ai.github.io/InvokeAI/"
@@ -125,17 +126,27 @@ dependencies = [
 "Discord" = "https://discord.gg/ZmtBAhwWhy"
 
 [tool.setuptools.dynamic]
-version = { attr = "ldm.invoke.__version__" }
+version = { attr = "invokeai.version.__version__" }
 
 [tool.setuptools.packages.find]
 "where" = ["."]
-"include" = ["invokeai.assets.web*", "invokeai.backend*", "invokeai.frontend.dist*", "invokeai.configs*", "ldm*"]
+"include" = [
+    "invokeai.assets.web*","invokeai.version*",
+    "invokeai.generator*","invokeai.backend*",
+    "invokeai.frontend*", "invokeai.frontend.web.dist*",
+    "invokeai.configs*",
+    "invokeai.app*","ldm*",
+]
 
 [tool.setuptools.package-data]
 "invokeai.assets.web" = ["**.png"]
 "invokeai.backend" = ["**.png"]
 "invokeai.configs" = ["*.example", "**/*.yaml", "*.txt"]
-"invokeai.frontend.dist" = ["**"]
+"invokeai.frontend.web.dist" = ["**"]
 
 [tool.pytest.ini_options]
 addopts = "-p pytest_cov --junitxml=junit/test-results.xml --cov-report=term:skip-covered --cov=ldm/invoke --cov=backend --cov-branch"
+
+[flake8]
+max-line-length = 120
+
