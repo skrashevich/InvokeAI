@@ -107,7 +107,7 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 
 # Install requirements
 COPY --link pyproject.toml .
-COPY --link invokeai/version invokeai/version
+COPY --link invokeai/version/invokeai_version.py invokeai/version/__init__.py invokeai/version/
 ARG PIP_EXTRA_INDEX_URL
 ENV PIP_EXTRA_INDEX_URL ${PIP_EXTRA_INDEX_URL}
 RUN --mount=type=bind,from=xformers-builder,source=/wheels,target=/wheels --mount=type=cache,target=${PIP_CACHE_DIR} \
