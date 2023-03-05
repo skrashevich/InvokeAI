@@ -34,6 +34,49 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 # Don't fall back to legacy build system
 ENV PIP_USE_PEP517=1
+# Allow pre-release packages
+ENV PIP_PRE=1
+
+FROM python-base AS xformers-builder
+# Install build dependencies
+RUN \
+  --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  apt-get update \
+  && apt-get install -y \
+    --no-install-recommends \
+    build-essential=12.9 \
+    gcc=4:10.2.* \
+    python3-dev=3.9.* \
+    git wget
+
+# Prepare pip for buildkit cache
+ARG PIP_CACHE_DIR=/var/cache/buildkit/pip
+ENV PIP_CACHE_DIR ${PIP_CACHE_DIR}
+RUN mkdir -p ${PIP_CACHE_DIR}
+
+ARG PIP_EXTRA_INDEX_URL
+ENV PIP_EXTRA_INDEX_URL ${PIP_EXTRA_INDEX_URL}
+
+ENV TORCH_CUDA_ARCH_LIST "6.1;8.6"
+
+ARG CUDA_VERSION=11.7.1
+ARG PLAT_NAME=manylinux2014_x86_64
+
+RUN wget -q https://developer.download.nvidia.com/compute/cuda/$CUDA_VERSION/local_installers/cuda_${CUDA_VERSION}_515.65.01_linux.run -O cuda.run \
+    && sh ./cuda.run --silent --toolkit \
+    && rm ./cuda.run
+
+RUN --mount=type=cache,target=${PIP_CACHE_DIR} pip3 install ninja setuptools numpy --pre torch torchvision torchaudio --force-reinstall
+ADD https://github.com/facebookresearch/xformers.git /src
+WORKDIR /src
+RUN --mount=type=cache,target=${PIP_CACHE_DIR} <<EOT bash
+sed -i '/torch/d' ./requirements.txt
+echo $(pip3 show torch | grep Version | cut -d' ' -f2) >> ./requirements.txt
+pip3 install -r requirements.txt
+python3 setup.py bdist_wheel -d /wheels --plat-name $PLAT_NAME
+EOT
+
 
 #######################
 ##  build pyproject  ##
@@ -49,7 +92,8 @@ RUN \
     --no-install-recommends \
     build-essential=12.9 \
     gcc=4:10.2.* \
-    python3-dev=3.9.*
+    python3-dev=3.9.* \
+    git
 
 # Prepare pip for buildkit cache
 ARG PIP_CACHE_DIR=/var/cache/buildkit/pip
@@ -66,13 +110,13 @@ COPY --link pyproject.toml .
 COPY --link invokeai/version invokeai/version
 ARG PIP_EXTRA_INDEX_URL
 ENV PIP_EXTRA_INDEX_URL ${PIP_EXTRA_INDEX_URL}
-RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
-  "${APPNAME}"/bin/pip install .
+RUN --mount=type=bind,from=xformers-builder,source=/wheels,target=/wheels --mount=type=cache,target=${PIP_CACHE_DIR} \
+  "${APPNAME}"/bin/pip install --find-links=/wheels .
 
 # Install pyproject.toml
 COPY --link . .
-RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
-  "${APPNAME}/bin/pip" install .
+RUN --mount=type=bind,from=xformers-builder,source=/wheels,target=/wheels --mount=type=cache,target=${PIP_CACHE_DIR} \
+  "${APPNAME}/bin/pip" install --find-links=/wheels .
 
 # Build patchmatch
 RUN python3 -c "from patchmatch import patch_match"
