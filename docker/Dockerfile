@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:labs
 
 ARG PYTHON_VERSION=3.9
 ##################
