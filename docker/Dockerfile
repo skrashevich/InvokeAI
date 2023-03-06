@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:labs
+# syntax=docker/dockerfile:1.5-labs
 
 ARG PYTHON_VERSION=3.9
 ##################
@@ -38,44 +38,7 @@ ENV PIP_USE_PEP517=1
 ENV PIP_PRE=1
 
 FROM python-base AS xformers-builder
-# Install build dependencies
-RUN \
-  --mount=type=cache,target=/var/cache/apt,sharing=locked \
-  --mount=type=cache,target=/var/lib/apt,sharing=locked \
-  apt-get update \
-  && apt-get install -y \
-    --no-install-recommends \
-    build-essential=12.9 \
-    gcc=4:10.2.* \
-    python3-dev=3.9.* \
-    git wget
-
-# Prepare pip for buildkit cache
-ARG PIP_CACHE_DIR=/var/cache/buildkit/pip
-ENV PIP_CACHE_DIR ${PIP_CACHE_DIR}
-RUN mkdir -p ${PIP_CACHE_DIR}
-
-ARG PIP_EXTRA_INDEX_URL
-ENV PIP_EXTRA_INDEX_URL ${PIP_EXTRA_INDEX_URL}
-
-ENV TORCH_CUDA_ARCH_LIST "6.1;8.6"
-
-ARG CUDA_VERSION=11.7.1
-ARG PLAT_NAME=manylinux2014_x86_64
-
-RUN wget -q https://developer.download.nvidia.com/compute/cuda/$CUDA_VERSION/local_installers/cuda_${CUDA_VERSION}_515.65.01_linux.run -O cuda.run \
-    && sh ./cuda.run --silent --toolkit \
-    && rm ./cuda.run
-
-RUN --mount=type=cache,target=${PIP_CACHE_DIR} pip3 install ninja setuptools numpy --pre torch torchvision torchaudio --force-reinstall
-ADD https://github.com/facebookresearch/xformers.git /src
-WORKDIR /src
-RUN --mount=type=cache,target=${PIP_CACHE_DIR} <<EOT bash
-sed -i '/torch/d' ./requirements.txt
-echo $(pip3 show torch | grep Version | cut -d' ' -f2) >> ./requirements.txt
-pip3 install -r requirements.txt
-python3 setup.py bdist_wheel -d /wheels --plat-name $PLAT_NAME
-EOT
+ADD https://github.com/skrashevich/xformers/releases/download/nightly/xformers-0.0.17.dev468-cp39-cp39-manylinux2014_x86_64.whl /wheels/
 
 
 #######################
