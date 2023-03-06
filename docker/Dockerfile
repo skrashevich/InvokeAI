@@ -37,10 +37,6 @@ ENV PIP_USE_PEP517=1
 # Allow pre-release packages
 ENV PIP_PRE=1
 
-FROM python-base AS xformers-builder
-ADD https://github.com/skrashevich/xformers/releases/download/nightly/xformers-0.0.17.dev468-cp39-cp39-manylinux2014_x86_64.whl /wheels/
-
-
 #######################
 ##  build pyproject  ##
 #######################
@@ -73,13 +69,11 @@ COPY --link pyproject.toml .
 COPY --link invokeai/version/invokeai_version.py invokeai/version/__init__.py invokeai/version/
 ARG PIP_EXTRA_INDEX_URL
 ENV PIP_EXTRA_INDEX_URL ${PIP_EXTRA_INDEX_URL}
-RUN --mount=type=bind,from=xformers-builder,source=/wheels,target=/wheels --mount=type=cache,target=${PIP_CACHE_DIR} \
-  "${APPNAME}"/bin/pip install --find-links=/wheels .
+RUN --mount=type=cache,target=${PIP_CACHE_DIR} "${APPNAME}"/bin/pip install .
 
 # Install pyproject.toml
 COPY --link . .
-RUN --mount=type=bind,from=xformers-builder,source=/wheels,target=/wheels --mount=type=cache,target=${PIP_CACHE_DIR} \
-  "${APPNAME}/bin/pip" install .
+RUN --mount=type=cache,target=${PIP_CACHE_DIR} "${APPNAME}/bin/pip" install .
 
 # Build patchmatch
 RUN python3 -c "from patchmatch import patch_match"
