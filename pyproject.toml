@@ -77,8 +77,6 @@ dependencies = [
   "transformers~=4.26",
   "uvicorn[standard]==0.20.0",
   "windows-curses; sys_platform=='win32'",
-	"xformers; sys_platform != 'darwin'",
-	"triton; sys_platform=='linux'",
 ]
 
 [project.optional-dependencies]
@@ -92,7 +90,10 @@ dependencies = [
   "pudb",
 ]
 "test" = ["pytest>6.0.0", "pytest-cov"]
-
+"xformers" = [
+	   "xformers~=0.0.16; sys_platform!='darwin'",
+	   "triton; sys_platform=='linux'",
+]
 
 [project.scripts]
 

@@ -3,6 +3,7 @@ invokeai.backend.generator.txt2img inherits from invokeai.backend.generator
 """
 import PIL.Image
 import torch
+import torch._dynamo
 
 from ..stable_diffusion import (
     ConditioningData,
@@ -77,5 +78,13 @@ class Txt2Img(Generator):
                 attention_maps_callback(pipeline_output.attention_map_saver)
 
             return pipeline.numpy_to_pil(pipeline_output.images)[0]
-
+        
+        if torch.__version__.startswith("2."):
+            if torch.cuda.is_available():
+                device = torch.device("cuda")
+                capability = torch.cuda.get_device_capability(device)
+                capability_level = float(f"{capability[0]}.{capability[1]}")
+                if capability_level >= 7.0:
+                    torch._dynamo.config.suppress_errors = True
+                    return torch.compile(make_image)
         return make_image
