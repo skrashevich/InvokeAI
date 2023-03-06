@@ -446,6 +446,7 @@ class Generate:
         height = height or self.height
 
         if isinstance(model, DiffusionPipeline):
+            model.unet = torch.compile(model.unet)
             configure_model_padding(model.unet, seamless, seamless_axes)
             configure_model_padding(model.vae, seamless, seamless_axes)
         else:
