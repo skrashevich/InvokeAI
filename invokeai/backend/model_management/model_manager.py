@@ -333,10 +333,23 @@ class ModelManager(object):
 
         tic = time.time()
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            model, width, height, model_hash = self._load_diffusers_model(mconfig)
-
+        # this does the work
+        model_format = mconfig.get("format", "ckpt")
+        if model_format == "ckpt":
+            weights = mconfig.weights
+            print(f">> Loading {model_name} from {weights}")
+            model, width, height, model_hash = self._load_ckpt_model(
+                model_name, mconfig
+            )
+        elif model_format == "diffusers":
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                model, width, height, model_hash = self._load_diffusers_model(mconfig)
+        else:
+            raise NotImplementedError(
+                f"Unknown model format {model_name}: {model_format}"
+            )
+        
         # usage statistics
         toc = time.time()
         print(">> Model loaded in", "%4.2fs" % (toc - tic))
@@ -525,7 +538,7 @@ class ModelManager(object):
         self,
         repo_or_path: Union[str, Path],
         model_name: str = None,
-        model_description: str = None,
+        description: str = None,
         vae: dict = None,
         commit_to_conf: Path = None,
     ) -> bool:
