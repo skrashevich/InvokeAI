@@ -21,7 +21,8 @@ RUN \
     --no-install-recommends \
     libgl1-mesa-glx=20.3.* \
     libglib2.0-0=2.66.* \
-    libopencv-dev=4.5.*
+    libopencv-dev=4.5.* \
+    gcc=4:10.2.*
 
 # Set working directory and env
 ARG APPDIR=/usr/src
