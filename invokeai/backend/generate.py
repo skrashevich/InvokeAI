@@ -215,6 +215,20 @@ class Generate:
         else:
             print(">> xformers not installed")
 
+        if torch.__version__.startswith("2."):
+            if torch.cuda.is_available():
+                device = torch.device("cuda")
+                capability = torch.cuda.get_device_capability(device)
+                capability_level = float(f"{capability[0]}.{capability[1]}")
+                if capability_level >= 7.0:
+                    if Globals.disable_compile:
+                        print(">> torch.compile() is available but disabled")
+                    else:
+                        print(">> torch.compile() is available and enabled")
+        else:
+            print(">> PyTorch >= 2.0 not installed")
+    
+
         # model caching system for fast switching
         self.model_manager = ModelManager(
             mconfig,

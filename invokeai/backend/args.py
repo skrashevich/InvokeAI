@@ -528,6 +528,12 @@ class Args(object):
             help="Enable/disable xformers support (default enabled if installed)",
         )
         model_group.add_argument(
+            "--triton_compile",
+            action=argparse.BooleanOptionalAction,
+            default=False,
+            help="Enable/disable torch.compile (default disabled if pytorch2 installed)",
+        )
+        model_group.add_argument(
             "--always_use_cpu",
             dest="always_use_cpu",
             action="store_true",

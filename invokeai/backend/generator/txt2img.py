@@ -11,6 +11,7 @@ from ..stable_diffusion import (
     StableDiffusionGeneratorPipeline,
 )
 from .base import Generator
+from ..globals import Globals
 
 
 class Txt2Img(Generator):
@@ -79,7 +80,7 @@ class Txt2Img(Generator):
 
             return pipeline.numpy_to_pil(pipeline_output.images)[0]
         
-        if torch.__version__.startswith("2."):
+        if torch.__version__.startswith("2.") and not Globals.disable_compile:
             if torch.cuda.is_available():
                 device = torch.device("cuda")
                 capability = torch.cuda.get_device_capability(device)

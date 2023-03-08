@@ -42,6 +42,7 @@ class ApiDependencies:
         Globals.always_use_cpu = args.always_use_cpu
         Globals.internet_available = args.internet_available and check_internet()
         Globals.disable_xformers = not args.xformers
+        Globals.disable_compile = not args.triton_compile
         Globals.ckpt_convert = args.ckpt_convert
 
         # TODO: Use a logger

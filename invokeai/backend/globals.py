@@ -57,6 +57,8 @@ Globals.internet_available = True
 # Whether to disable xformers
 Globals.disable_xformers = False
 
+Globals.disable_compile = True
+
 # Low-memory tradeoff for guidance calculations.
 Globals.sequential_guidance = False
 

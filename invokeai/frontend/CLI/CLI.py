@@ -63,6 +63,7 @@ def main():
     Globals.always_use_cpu = args.always_use_cpu
     Globals.internet_available = args.internet_available and check_internet()
     Globals.disable_xformers = not args.xformers
+    Globals.disable_compile = not args.triton_compile
     Globals.sequential_guidance = args.sequential_guidance
     Globals.ckpt_convert = True  # always true now
 
