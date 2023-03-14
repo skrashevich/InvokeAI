@@ -6,16 +6,14 @@ on:
     paths:
       - 'pyproject.toml'
       - 'invokeai/**'
-      - 'invokeai/backend/**'
-      - 'invokeai/configs/**'
-      - 'invokeai/frontend/dist/**'
+      - '!invokeai/frontend/web/**'
+      - 'invokeai/frontend/web/dist/**'
   pull_request:
     paths:
       - 'pyproject.toml'
       - 'invokeai/**'
-      - 'invokeai/backend/**'
-      - 'invokeai/configs/**'
-      - 'invokeai/frontend/dist/**'
+      - '!invokeai/frontend/web/**'
+      - 'invokeai/frontend/web/dist/**'
     types:
       - 'ready_for_review'
       - 'opened'
