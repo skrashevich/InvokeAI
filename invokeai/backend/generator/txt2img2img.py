@@ -50,6 +50,9 @@ class Txt2Img2Img(Generator):
         pipeline: StableDiffusionGeneratorPipeline = self.model
         pipeline.scheduler = sampler
 
+        pipeline.enable_sequential_cpu_offload()
+        pipeline.enable_attention_slicing(1)
+
         uc, c, extra_conditioning_info = conditioning
         conditioning_data = ConditioningData(
             uc,

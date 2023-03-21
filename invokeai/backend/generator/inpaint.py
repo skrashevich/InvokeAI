@@ -305,6 +305,9 @@ class Inpaint(Img2Img):
         pipeline: StableDiffusionGeneratorPipeline = self.model
         pipeline.scheduler = sampler
 
+        pipeline.enable_sequential_cpu_offload()
+        pipeline.enable_attention_slicing(1)
+
         # todo: support cross-attention control
         uc, c, _ = conditioning
         conditioning_data = ConditioningData(
