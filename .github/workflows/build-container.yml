@@ -48,7 +48,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: |
             ghcr.io/${{ github.repository }}
-            ${{ vars.DOCKERHUB_REPOSITORY }}
           tags: |
             type=ref,event=branch
             type=ref,event=tag
