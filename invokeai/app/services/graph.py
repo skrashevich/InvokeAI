@@ -794,9 +794,6 @@ class GraphExecutionState(BaseModel):
         default_factory=dict,
     )
 
-    # Declare all fields as required; necessary for OpenAPI schema generation build.
-    # Technically only fields without a `default_factory` need to be listed here.
-    # See: https://github.com/pydantic/pydantic/discussions/4577
     class Config:
         schema_extra = {
             'required': [
@@ -1069,9 +1066,8 @@ class GraphExecutionState(BaseModel):
                 n
                 for n in prepared_nodes
                 if all(
-                    pit
+                    nx.has_path(execution_graph, pit[0], n)
                     for pit in parent_iterators
-                    if nx.has_path(execution_graph, pit[0], n)
                 )
             ),
             None,
